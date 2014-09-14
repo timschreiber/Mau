@@ -1,4 +1,5 @@
-#Mau Simplifies Mapping Objects to Database Queries
+#Introducing Mau
+Mau simplifies mapping objects to database queries.
 ##Features
 * No database-specific implementation details. Should work with any ADO.NET provider (tested with SQL Server and MySQL).
 * No configuration.
@@ -10,14 +11,14 @@
 * Transaction support through Context and Unit of Work objects.
 
 ##Code Samples
-####Get an AdoNetContext object:
+####Get an Context object:
     var factory = new AppConfigConnectionFactory("connection-string-name");
     var context = new AdoNetContext(factory);
-####Execute a Query and Map Result to strongly-typed Enumerable
+####Execute a Query and Map the Result to a Strongly Typed Enumerable
     var products = context.Query<Product>(
         "SELECT * FROM Products WHERE CategoryId == @CategoryId",
         new { CategoryId = 1 });
-####Execute a Query and Map Result to Enumerable of Dynamic Objects
+####Execute a Query and Map the Result to an Enumerable of Dynamic Objects
     var products = context.Query(
         "SELECT * FROM Products WHERE CategoryId == @CategoryId",
         new { CategoryId = 2 });

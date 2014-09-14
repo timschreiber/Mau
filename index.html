@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Mau by Tim Schreiber</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Mau</h1>
+          <h2></h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/timschreiber/Mau/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/timschreiber/Mau/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/timschreiber/Mau" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="introducing-mau" class="anchor" href="#introducing-mau"><span class="octicon octicon-link"></span></a>Introducing Mau</h1>
+
+<p>Mau is a Micro-ORM for .NET that simplifies mapping objects to database queries.</p>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>No database-specific implementation details. Should work with any ADO.NET provider (tested with SQL Server and MySQL).</li>
+<li>No configuration.</li>
+<li>Uses regular SQL - still the best domain specific language for relational data.</li>
+<li>Supports parameterized text queries or stored procedures.</li>
+<li>Automatically maps query results to Enumerable of:
+
+<ul>
+<li>Strongly-typed objects, or</li>
+<li>Dynamic objects.</li>
+</ul>
+</li>
+<li>Transaction support through Context and Unit of Work objects.</li>
+<li>IoC Friendly</li>
+</ul><h2>
+<a name="code-samples" class="anchor" href="#code-samples"><span class="octicon octicon-link"></span></a>Code Samples</h2>
+
+<h4>
+<a name="get-an-context-object" class="anchor" href="#get-an-context-object"><span class="octicon octicon-link"></span></a>Get an Context object:</h4>
+
+<pre><code>var factory = new AppConfigConnectionFactory("connection-string-name");
+var context = new AdoNetContext(factory);
+</code></pre>
+
+<h4>
+<a name="execute-a-query-and-map-the-result-to-a-strongly-typed-enumerable" class="anchor" href="#execute-a-query-and-map-the-result-to-a-strongly-typed-enumerable"><span class="octicon octicon-link"></span></a>Execute a Query and Map the Result to a Strongly Typed Enumerable</h4>
+
+<pre><code>var products = context.Query&lt;Cat&gt;(
+    "SELECT * FROM Cats WHERE BreedId == @BreedId",
+    new { BreedId = 1 });
+</code></pre>
+
+<h4>
+<a name="execute-a-query-and-map-the-result-to-an-enumerable-of-dynamic-objects" class="anchor" href="#execute-a-query-and-map-the-result-to-an-enumerable-of-dynamic-objects"><span class="octicon octicon-link"></span></a>Execute a Query and Map the Result to an Enumerable of Dynamic Objects</h4>
+
+<pre><code>var products = context.Query(
+    "SELECT * FROM Cats WHERE BreedId == @BreedId",
+    new { BreedId = 2 });
+</code></pre>
+
+<h4>
+<a name="execute-a-command-that-returns-a-scalar-value" class="anchor" href="#execute-a-command-that-returns-a-scalar-value"><span class="octicon octicon-link"></span></a>Execute a Command That Returns a Scalar Value</h4>
+
+<pre><code>var breedId = context.Scalar&lt;int&gt;(
+    "INSERT INTO Breed(Name) VALUES(@Name); SELECT SCOPE_IDENTITY();",
+    new { Name = "Egyptian Mau" });
+</code></pre>
+
+<h4>
+<a name="execute-a-command-that-doesnt-return-anything" class="anchor" href="#execute-a-command-that-doesnt-return-anything"><span class="octicon octicon-link"></span></a>Execute a Command That Doesn't Return Anything</h4>
+
+<pre><code>context.Execute(
+    "DELETE FROM Cat WHERE BreedId &lt; @MinBreedId,
+    new { MinBreedId = 2 });
+</code></pre>
+
+<h4>
+<a name="execute-multiple-commands-in-a-transaction" class="anchor" href="#execute-multiple-commands-in-a-transaction"><span class="octicon octicon-link"></span></a>Execute Multiple Commands in a Transaction</h4>
+
+<pre><code>var breed1 = new Breed { Name = "Egyptian Mau" };
+var breed2 = new Breed { Name = "Arabian Mau" };
+
+var cat1 = new Cat
+{
+    Name = "Pharoh",
+    Age = 4
+};
+
+var cat2 = new Cat
+{
+    Name = "Tut",
+    Age = 2
+};
+
+var cat3 = new Cat
+{
+    Name = "Anas",
+    Age = 8
+};
+
+using(var uow = context.CreateUnitOfWork())
+{
+    var sql = "INSERT INTO Breed(Name) VALUES(@Name); SELECT @@SCOPE_IDENTITY()";
+
+    breed1.BreedId = context.Scalar&lt;int&gt;(sql, new { Name = breed1.Name })
+    breed2.BreedId = context.Scalar&lt;int&gt;(sql, new { Name = breed2.Name })
+
+    cat1.BreedId = breed1.BreedId;
+    cat2.BreedId = breed1.BreedId;
+    cat3.BreedId = breed2.BreedId;
+
+    sql = @"INSERT INTO Cat(Name, Age, BreedId) VALUES(@Name, @Age, @BreedId)";
+
+    context.Execute(sql, new
+    {
+        Name = cat1.Name,
+        Age = cat1.Age,
+        BreedId = cat1.BreedId
+    });
+
+    context.Execute(sql, new
+    {
+        Name = cat2.Name,
+        Age = cat2.Age,
+        BreedId = cat2.BreedId
+    });
+
+    context.Execute(sql, new
+    {
+        Name = cat3.Name,
+        Age = cat3.Age,
+        BreedId = cat3.BreedId
+    });
+
+    uow.SaveChanges();
+}
+</code></pre>
+
+<h4>
+<a name="ioc-friendliness" class="anchor" href="#ioc-friendliness"><span class="octicon octicon-link"></span></a>IoC Friendliness</h4>
+
+<pre><code>var container = new UnityContainer();
+container.RegisterType&lt;IConnectionFactory, AppConfigConnectionFactory&gt;(new ContainerControlledLifetimeManager(), new InjectionConstructor("ConnectionStringName"));
+container.RegisterType&lt;IAdoNetContext, AdoNetContext&gt;(new HierarchicalLifetimeManager());
+</code></pre>
+        </section>
+
+        <footer>
+          Mau is maintained by <a href="https://github.com/timschreiber">timschreiber</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>

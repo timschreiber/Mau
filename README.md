@@ -16,88 +16,74 @@ Mau simplifies mapping objects to database queries.
     var context = new AdoNetContext(factory);
 ####Execute a Query and Map the Result to a Strongly Typed Enumerable
     var products = context.Query<Product>(
-        "SELECT * FROM Products WHERE CategoryId == @CategoryId",
-        new { CategoryId = 1 });
+        "SELECT * FROM Cats WHERE BreedId == @BreedId",
+        new { BreedId = 1 });
 ####Execute a Query and Map the Result to an Enumerable of Dynamic Objects
     var products = context.Query(
-        "SELECT * FROM Products WHERE CategoryId == @CategoryId",
-        new { CategoryId = 2 });
+        "SELECT * FROM Cats WHERE BreedId == @BreedId",
+        new { BreedId = 2 });
 ####Execute a Command That Returns a Scalar Value
-    var categoryId = context.Scalar<int>(
-        "INSERT INTO Category(Name) VALUES(@Name); SELECT SCOPE_IDENTITY();",
-        new { Name = "Category 1" });
+    var breedId = context.Scalar<int>(
+        "INSERT INTO Breed(Name) VALUES(@Name); SELECT SCOPE_IDENTITY();",
+        new { Name = "Egyptian Mau" });
 ####Execute a Command That Doesn't Return Anything
     context.Execute(
-        "DELETE FROM Product WHERE CategoryId < @MinCategoryId,
-        new { MinCategoryId = 2 });
+        "DELETE FROM Cat WHERE BreedId < @MinBreedId,
+        new { MinBreedId = 2 });
 ####Execute Multiple Commands in a Transaction
-    Category category1 = new Category { Name = "Category 1" };
-    Category category2 = new Category { Name = "Category 2" };
+    var breed1 = new Breed { Name = "Egyptian Mau" };
+    var breed2 = new Breed { Name = "Arabian Mau" };
     
-    Product product1 = new Product
+    var cat1 = new Cat
     {
-        ProductId = "PROD123",
-        Name = "Product 123",
-        Description = "The first Product",
-        Price = 19.99M
+        Name = "Pharoh",
+        Age = 4
     };
     
-    Product product2 = new Product
+    var cat2 = new Cat
     {
-        ProductId = "PROD234",
-        Name = "Product 234",
-        Description = "The second Product",
-        Price = 24.99M
+        Name = "Tut",
+        Age = 2
     };
     
-    Product product3 = new Product
+    var cat3 = new Cat
     {
-        ProductId = "PROD345",
-        Name = "Product 345",
-        Description = "The third Product",
-        Price = 29.99M
+        Name = "Anas",
+        Age = 8
     };
     
     using(var uow = context.CreateUnitOfWork())
     {
-        var sql = "INSERT INTO Category(Name) VALUES(@Name); SELECT @@SCOPE_IDENTITY()";
+        var sql = "INSERT INTO Breed(Name) VALUES(@Name); SELECT @@SCOPE_IDENTITY()";
         
-        category1.CategoryId = context.Scalar<int>(sql, new { Name = category1.Name })
-        category2.CategoryId = context.Scalar<int>(sql, new { Name = category2.Name })
+        breed1.BreedId = context.Scalar<int>(sql, new { Name = breed1.Name })
+        breed2.BreedId = context.Scalar<int>(sql, new { Name = breed2.Name })
         
-        product1.CategoryId = category1.CategoryId;
-        product2.CategoryId = category2.CategoryId;
-        product3.CategoryId = category2.CategoryId;
+        cat1.BreedId = breed1.BreedId;
+        cat2.BreedId = breed1.BreedId;
+        cat3.BreedId = breed2.BreedId;
         
-        sql = @"
-            INSERT INTO Product(ProductId, CategoryId, Name, Description, Price)
-            VALUES(@ProductId, @CategoryId, @Name, @Description, @Price)";
+        sql = @"INSERT INTO Cat(Name, Age, BreedId) VALUES(@Name, @Age, @BreedId)";
         
         context.Execute(sql, new
         {
-            ProductId = product1.ProductId,
-            CategoryId = product1.CategoryId,
-            Name = product1.Name,
-            Description = product1.Description,
-            Price = product1.Price
+            Name = cat1.Name,
+            Age = cat1.Age,
+            BreedId = cat1.BreedId
         });
         
         context.Execute(sql, new
         {
-            ProductId = product2.ProductId,
-            CategoryId = product2.CategoryId,
-            Name = product2.Name,
-            Description = product2.Description,
-            Price = product2.Price
+            Name = cat2.Name,
+            Age = cat2.Age,
+            BreedId = cat2.BreedId
         });
         
         context.Execute(sql, new
         {
-            ProductId = product2.ProductId,
-            CategoryId = product2.CategoryId,
-            Name = product2.Name,
-            Description = product2.Description,
-            Price = product2.Price
+            Name = cat3.Name,
+            Age = cat3.Age,
+            BreedId = cat3.BreedId
         });
         
         uow.SaveChanges();

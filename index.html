@@ -41,7 +41,7 @@
 
 <ul>
 <li>No database-specific implementation details. Should work with any ADO.NET provider (tested with SQL Server and MySQL).</li>
-<li>No configuration.</li>
+<li>No configuration (apart for the connection string in your web or app.config).</li>
 <li>Uses regular SQL - still the best domain specific language for relational data.</li>
 <li>Supports parameterized text queries or stored procedures.</li>
 <li>Automatically maps query results to Enumerable of:
@@ -52,6 +52,7 @@
 </ul>
 </li>
 <li>Transaction support through Context and Unit of Work objects.</li>
+<li>Works in Partial Trust environments, so it's safe for shared hosting like GoDaddy.</li>
 <li>IoC Friendly</li>
 </ul><h2>
 <a name="code-samples" class="anchor" href="#code-samples"><span class="octicon octicon-link"></span></a>Code Samples</h2>

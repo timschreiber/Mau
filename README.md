@@ -15,7 +15,7 @@ Mau simplifies mapping objects to database queries.
     var factory = new AppConfigConnectionFactory("connection-string-name");
     var context = new AdoNetContext(factory);
 ####Execute a Query and Map the Result to a Strongly Typed Enumerable
-    var products = context.Query<Product>(
+    var products = context.Query<Cat>(
         "SELECT * FROM Cats WHERE BreedId == @BreedId",
         new { BreedId = 1 });
 ####Execute a Query and Map the Result to an Enumerable of Dynamic Objects

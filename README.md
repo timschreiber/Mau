@@ -13,9 +13,26 @@
 ####Get an AdoNetContext object:
     var factory = new AppConfigConnectionFactory("connection-string-name");
     var context = new AdoNetContext(factory);
-####Insert Records Using a Transaction
+####Execute a Query and Map Result to strongly-typed Enumerable
+    var products = context.Query<Product>(
+        "SELECT * FROM Products WHERE CategoryId == @CategoryId",
+        new { CategoryId = 1 });
+####Execute a Query and Map Result to Enumerable of Dynamic Objects
+    var products = context.Query(
+        "SELECT * FROM Products WHERE CategoryId == @CategoryId",
+        new { CategoryId = 2 });
+####Execute a Command That Returns a Scalar Value
+    var categoryId = context.Scalar<int>(
+        "INSERT INTO Category(Name) VALUES(@Name); SELECT SCOPE_IDENTITY();",
+        new { Name = "Category 1" });
+####Execute a Command That Doesn't Return Anything
+    context.Execute(
+        "DELETE FROM Product WHERE CategoryId < @MinCategoryId,
+        new { MinCategoryId = 2 });
+####Execute Multiple Commands in a Transaction
     Category category1 = new Category { Name = "Category 1" };
     Category category2 = new Category { Name = "Category 2" };
+    
     Product product1 = new Product
     {
         ProductId = "PROD123",
@@ -23,6 +40,7 @@
         Description = "The first Product",
         Price = 19.99M
     };
+    
     Product product2 = new Product
     {
         ProductId = "PROD234",
@@ -30,6 +48,7 @@
         Description = "The second Product",
         Price = 24.99M
     };
+    
     Product product3 = new Product
     {
         ProductId = "PROD345",

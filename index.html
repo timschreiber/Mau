@@ -60,7 +60,7 @@
 <h4>
 <a name="get-an-context-object" class="anchor" href="#get-an-context-object"><span class="octicon octicon-link"></span></a>Get an Context object:</h4>
 
-<pre><code>var factory = new AppConfigConnectionFactory("connection-string-name");
+<pre><code>var factory = new AppConfigConnectionFactory("connection-name");
 var context = new AdoNetContext(factory);
 </code></pre>
 
@@ -84,7 +84,8 @@ var context = new AdoNetContext(factory);
 <a name="execute-a-command-that-returns-a-scalar-value" class="anchor" href="#execute-a-command-that-returns-a-scalar-value"><span class="octicon octicon-link"></span></a>Execute a Command That Returns a Scalar Value</h4>
 
 <pre><code>var breedId = context.Scalar&lt;int&gt;(
-    "INSERT INTO Breed(Name) VALUES(@Name); SELECT SCOPE_IDENTITY();",
+    @"INSERT INTO Breed(Name) VALUES(@Name);
+      SELECT SCOPE_IDENTITY();",
     new { Name = "Egyptian Mau" });
 </code></pre>
 
@@ -122,16 +123,25 @@ var cat3 = new Cat
 
 using(var uow = context.CreateUnitOfWork())
 {
-    var sql = "INSERT INTO Breed(Name) VALUES(@Name); SELECT @@SCOPE_IDENTITY()";
+    var sql = @"INSERT INTO Breed(Name) VALUES(@Name);
+      SELECT @@SCOPE_IDENTITY()";
 
-    breed1.BreedId = context.Scalar&lt;int&gt;(sql, new { Name = breed1.Name })
-    breed2.BreedId = context.Scalar&lt;int&gt;(sql, new { Name = breed2.Name })
+    breed1.BreedId = context.Scalar&lt;int&gt;(sql, new
+    {
+      Name = breed1.Name
+    });
+    
+    breed2.BreedId = context.Scalar&lt;int&gt;(sql, new
+    {
+      Name = breed2.Name
+    });
 
     cat1.BreedId = breed1.BreedId;
     cat2.BreedId = breed1.BreedId;
     cat3.BreedId = breed2.BreedId;
 
-    sql = @"INSERT INTO Cat(Name, Age, BreedId) VALUES(@Name, @Age, @BreedId)";
+    sql = @"INSERT INTO Cat(Name, Age, BreedId)
+      VALUES(@Name, @Age, @BreedId)";
 
     context.Execute(sql, new
     {
@@ -162,8 +172,12 @@ using(var uow = context.CreateUnitOfWork())
 <a name="ioc-friendliness" class="anchor" href="#ioc-friendliness"><span class="octicon octicon-link"></span></a>IoC Friendliness</h4>
 
 <pre><code>var container = new UnityContainer();
-container.RegisterType&lt;IConnectionFactory, AppConfigConnectionFactory&gt;(new ContainerControlledLifetimeManager(), new InjectionConstructor("ConnectionStringName"));
-container.RegisterType&lt;IAdoNetContext, AdoNetContext&gt;(new HierarchicalLifetimeManager());
+container.RegisterType&lt;IConnectionFactory, AppConfigConnectionFactory&gt;(
+  new ContainerControlledLifetimeManager(),
+  new InjectionConstructor("ConnectionStringName"));
+  
+container.RegisterType&lt;IAdoNetContext, AdoNetContext&gt;(
+  new HierarchicalLifetimeManager());
 </code></pre>
         </section>
 

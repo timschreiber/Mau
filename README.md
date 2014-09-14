@@ -1,5 +1,5 @@
 #Introducing Mau
-Mau simplifies mapping objects to database queries.
+Mau is a Micro-ORM for .NET that simplifies mapping objects to database queries.
 ##Features
 * No database-specific implementation details. Should work with any ADO.NET provider (tested with SQL Server and MySQL).
 * No configuration.

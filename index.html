@@ -25,7 +25,7 @@
         <section id="downloads" class="clearfix">
           <a href="https://github.com/timschreiber/Mau/releases/download/v1.0/Mau.dll.zip" id="download-release" class="button"><span>Download v1.0</span></a>
           <a href="https://github.com/timschreiber/Mau/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/timschreiber/Mau/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <!--<a href="https://github.com/timschreiber/Mau/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>-->
           <!--<a href="https://github.com/timschreiber/Mau" id="view-on-github" class="button"><span>View on GitHub</span></a>-->
         </section>
 
@@ -42,14 +42,13 @@
 
 <ul>
 <li>No database-specific implementation details. Should work with any ADO.NET provider (tested with SQL Server and MySQL).</li>
-<li>No configuration (apart for the connection string in your web or app.config).</li>
+<li>No configuration (apart from the connection string in your web or app.config).</li>
 <li>Uses regular SQL - still the best domain specific language for relational data.</li>
 <li>Supports parameterized text queries or stored procedures.</li>
-<li>Automatically maps query results to Enumerable of:
-
+<li>Automatically maps query results:
 <ul>
-<li>Strongly-typed objects, or</li>
-<li>Dynamic objects.</li>
+<li>To a strongly-typed Enumerable, or</li>
+<li>An Enumerable of dynamic objects.</li>
 </ul>
 </li>
 <li>Transaction support through Context and Unit of Work objects.</li>

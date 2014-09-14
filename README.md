@@ -16,9 +16,27 @@
 ####Insert Records Using a Transaction
     Category category1 = new Category { Name = "Category 1" };
     Category category2 = new Category { Name = "Category 2" };
-    Product product1 = new Product { ProductId = "PROD123", Name = "Product 123", Description = "The first Product", Price = 19.99M };
-    Product product2 = new Product { ProductId = "PROD234", Name = "Product 234", Description = "The second Product", Price = 24.99M };
-    Product product3 = new Product { ProductId = "PROD345", Name = "Product 345", Description = "The third Product", Price = 29.99M };
+    Product product1 = new Product
+    {
+        ProductId = "PROD123",
+        Name = "Product 123",
+        Description = "The first Product",
+        Price = 19.99M
+    };
+    Product product2 = new Product
+    {
+        ProductId = "PROD234",
+        Name = "Product 234",
+        Description = "The second Product",
+        Price = 24.99M
+    };
+    Product product3 = new Product
+    {
+        ProductId = "PROD345",
+        Name = "Product 345",
+        Description = "The third Product",
+        Price = 29.99M
+    };
     
     using(var uow = context.CreateUnitOfWork())
     {
@@ -31,7 +49,9 @@
         product2.CategoryId = category2.CategoryId;
         product3.CategoryId = category2.CategoryId;
         
-        sql = "INSERT INTO Product(ProductId, CategoryId, Name, Description, Price) VALUES(@ProductId, @CategoryId, @Name, @Description, @Price)";
+        sql = @"
+            INSERT INTO Product(ProductId, CategoryId, Name, Description, Price)
+            VALUES(@ProductId, @CategoryId, @Name, @Description, @Price)";
         
         context.Execute(sql, new
         {

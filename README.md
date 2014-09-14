@@ -9,6 +9,7 @@ Mau simplifies mapping objects to database queries.
   * Strongly-typed objects, or
   * Dynamic objects.
 * Transaction support through Context and Unit of Work objects.
+* IoC Friendly
 
 ##Code Samples
 ####Get an Context object:
@@ -88,3 +89,7 @@ Mau simplifies mapping objects to database queries.
         
         uow.SaveChanges();
     }
+#### IoC Friendliness
+    var container = new UnityContainer();
+    container.RegisterType<IConnectionFactory, AppConfigConnectionFactory>(new ContainerControlledLifetimeManager(), new InjectionConstructor("ConnectionStringName"));
+    container.RegisterType<IAdoNetContext, AdoNetContext>(new HierarchicalLifetimeManager());

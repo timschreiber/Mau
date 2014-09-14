@@ -2,13 +2,14 @@
 Mau is a Micro-ORM for .NET that simplifies mapping objects to database queries.
 ##Features
 * No database-specific implementation details. Should work with any ADO.NET provider (tested with SQL Server and MySQL).
-* No configuration.
+* No configuration (apart for the connection string in your web or app.config).
 * Uses regular SQL - still the best domain specific language for relational data.
 * Supports parameterized text queries or stored procedures.
 * Automatically maps query results to Enumerable of:
   * Strongly-typed objects, or
   * Dynamic objects.
 * Transaction support through Context and Unit of Work objects.
+* Works in Partial Trust environments, so it's safe for shared hosting like GoDaddy.
 * IoC Friendly
 
 ##Code Samples
